@@ -70,7 +70,17 @@ gh release edit v0.1.1 --draft=false --latest
 ```
 
 Verify unauthenticated release/download URLs and run the documented installation
-command after publication. The workflow deliberately stops at a draft; a tag push
+command after publication. Run the manual native public-install check as well:
+
+```sh
+gh workflow run verify-install.yml --ref main -f version=0.1.1
+```
+
+It runs the README's one-command installers on Linux, macOS and Windows without
+GitHub credentials, uses temporary installation directories, and checks the
+installed version and retained notices. It does not install a background service.
+
+The release workflow deliberately stops at a draft; a tag push
 does not immediately make unreviewed artifacts public. Do not move a released tag
 or replace published assets. For a changed binary or installer, publish a new
 package version. Project crate publication remains disabled (`publish = false`).

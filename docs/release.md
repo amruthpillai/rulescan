@@ -20,8 +20,9 @@ The README distinguishes available binary targets from unqualified operations.
 
 ## Gates
 
-- [ ] Fresh exact-source CI on Linux, macOS and Windows; native ARM execution before
+- [x] Fresh exact-source CI on Linux, macOS and Windows; native ARM execution before
       declaring ARM support, and a separate musl build/test before portability claims.
+      See [binary release validation](release-validation.md) for source and native-run evidence.
 - [ ] Windows file identity, owner-only ACLs, reparse-point handling, ADS preservation,
       locked files, OneDrive/UNC behavior and no-replace moves before enabling approvals or mutation.
 - [ ] Native macOS Terminal versus LaunchAgent privacy permission tests, including
