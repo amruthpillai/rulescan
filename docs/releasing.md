@@ -12,6 +12,9 @@
 
 The release workflow pins Rust 1.95.0 and Python 3.12. Linux binaries use musl and
 bundled SQLite, and their tests execute on the same CPU architecture as the build.
+The musl C compiler builds bundled C dependencies; Rust's self-contained linker
+configuration builds the executable. Packaged ELF checks reject an interpreter or
+shared-library dependencies before a Linux archive qualifies for publication.
 Both macOS builds set their deployment floor to macOS 15.0.
 This does not certify every Linux distribution/kernel or every supported OS version.
 Windows currently offers inventory/inspection only; approving baselines and active

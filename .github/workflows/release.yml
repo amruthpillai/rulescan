@@ -94,12 +94,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes musl-tools tmux
-          python - <<'PY'
-          import os
-          key = "CARGO_TARGET_" + os.environ["RELEASE_TARGET"].replace("-", "_").upper() + "_LINKER"
-          with open(os.environ["GITHUB_ENV"], "a") as output:
-              output.write(f"CC=musl-gcc\n{key}=musl-gcc\n")
-          PY
+          # Compile bundled C code with musl; Rust owns self-contained executable linking.
+          # Forcing musl-gcc as Rust's linker adds a loader to x64 static PIE binaries.
+          printf 'CC=musl-gcc\n' >> "$GITHUB_ENV"
       - name: Set the macOS deployment floor
         if: runner.os == 'macOS'
         run: printf 'MACOSX_DEPLOYMENT_TARGET=15.0\n' >> "$GITHUB_ENV"
@@ -149,6 +146,11 @@ jobs:
               if manifest["commit"] != os.environ["SOURCE_SHA"] or manifest["target"] != os.environ["RELEASE_TARGET"]:
                   raise SystemExit("Packaged manifest does not match this native build")
               binary = destination / manifest["binary"]
+              if os.environ["RUNNER_OS"] == "Linux":
+                  headers = subprocess.check_output(["readelf", "-lW", str(binary)], text=True)
+                  dynamic = subprocess.check_output(["readelf", "-dW", str(binary)], text=True)
+                  if "INTERP" in headers or "(NEEDED)" in dynamic:
+                      raise SystemExit("Linux release must be static, with no runtime loader or shared libraries")
               result = subprocess.check_output([str(binary), "--version"], text=True).strip()
               if result != "rulescan " + os.environ["PACKAGE_VERSION"]:
                   raise SystemExit("Packaged executable has an unexpected version")

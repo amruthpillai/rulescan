@@ -95,7 +95,8 @@ try {
     [IO.File]::Copy((Join-Path $extracted 'THIRD_PARTY_NOTICES.txt'), $stagedNotices, $false)
     function Publish-File([string] $Staged, [string] $Destination) {
         Assert-RegularDestination $Destination
-        if ([IO.File]::Exists($Destination)) { [IO.File]::Replace($Staged, $Destination, $null) }
+        # Windows PowerShell marshals $null to an empty string for .NET string parameters.
+        if ([IO.File]::Exists($Destination)) { [IO.File]::Replace($Staged, $Destination, [NullString]::Value) }
         else { [IO.File]::Move($Staged, $Destination) }
     }
     Publish-File $stagedNotices $noticesTarget
