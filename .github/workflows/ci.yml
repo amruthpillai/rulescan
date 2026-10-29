@@ -16,10 +16,28 @@ jobs:
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
           components: rustfmt, clippy
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
       - run: cargo fmt --all -- --check
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked --all-targets
+      - run: python -m unittest discover -s tests -p test_package_release.py
+      - if: runner.os != 'Windows'
+        run: python tests/test_installers.py
       - run: cargo build --locked --release
+      - name: Install terminal-test dependency on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tmux
+      - name: Install terminal-test dependency on macOS
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew list tmux >/dev/null 2>&1 || brew install tmux
+      - if: runner.os != 'Windows'
+        run: python tests/test_terminal_disconnect.py --binary target/release/rulescan
       - name: Verify packaged command
         shell: bash
         run: |

@@ -1,21 +1,22 @@
 # Native packaging and release qualification
 
-This is an unpublished development package. The initial CI definition builds,
-formats, lints, tests and packages binaries on native macOS, Linux and Windows
-GitHub runners. CI has not been dispatched or observed from this local checkout.
-Its build artifacts are unsigned development binaries, not public releases.
+RuleScan binaries are distributed through [GitHub releases](https://github.com/amruthpillai/rulescan/releases).
+The [release workflow](releasing.md) builds and tests five native targets, verifies
+the packaged executables and installers, and assembles a draft with checksums.
+Publication is explicit after inspecting that draft. The source package is not
+published to crates.io.
 
 Install a local development binary with `cargo install --path . --locked`. Startup
 integration is a separate explicit `service install` preview / `--apply` operation.
 The base command never registers login items. See `background.md` for generated
 native definitions. Uninstall preserves approvals, configuration and quarantine.
 
-Choose the project license, release names and tested minimum OS versions before
-distribution. Generate notices/inventory, run a fresh RustSec advisory audit, and
-include notices alongside each binary. Public artifacts need checksums, source
-revision, build/target metadata, install instructions and an explicit compatibility
-matrix. Sign/notarize macOS and sign Windows packages with maintainer-managed
-credentials only after the native tests below. No credentials are embedded here.
+Artifacts retain dependency notices, checksums and exact source/target manifests.
+The [advisory audit](security-audit.md) records the audited lockfile and its one
+maintenance warning. Project-level open-source licensing remains unselected.
+Initial binaries are unsigned: macOS notarization and Windows signing are not
+provided. No signing credentials are embedded or requested by the installers.
+The README distinguishes available binary targets from unqualified operations.
 
 ## Gates
 

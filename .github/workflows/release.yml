@@ -1,0 +1,241 @@
+name: Release binaries
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Version tag matching Cargo.toml (a new tag is created only for the completed draft)
+        required: true
+        default: v0.1.0
+        type: string
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+      source_sha: ${{ steps.version.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Validate release version and immutable source
+        id: version
+        env:
+          REQUESTED_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, subprocess
+          metadata = json.loads(subprocess.check_output(["cargo", "metadata", "--no-deps", "--locked", "--format-version", "1"]))
+          package = next(p for p in metadata["packages"] if p["name"] == "rulescan" and p["id"] in metadata["workspace_members"])
+          version = package["version"]
+          tag = os.environ["REQUESTED_TAG"]
+          if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?", version) or tag != "v" + version:
+              raise SystemExit("Release tag must equal v followed by Cargo.toml's exact package version")
+          source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          refs = subprocess.check_output(["git", "ls-remote", "--tags", "origin", "refs/tags/" + tag, "refs/tags/" + tag + "^{}"], text=True).splitlines()
+          resolved = {line.split()[1]: line.split()[0] for line in refs}
+          existing = resolved.get("refs/tags/" + tag + "^{}", resolved.get("refs/tags/" + tag))
+          if existing and existing != source:
+              raise SystemExit("Existing tag points to a different commit; do not retag a release")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write(f"tag={tag}\nversion={version}\nsource_sha={source}\n")
+          print(f"Build {tag} from exact source {source}")
+          PY
+
+  build:
+    needs: prepare
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-musl
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+          - os: macos-15
+            target: aarch64-apple-darwin
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+    defaults:
+      run:
+        shell: bash
+    env:
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      PACKAGE_VERSION: ${{ needs.prepare.outputs.version }}
+      SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
+      RELEASE_TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.prepare.outputs.source_sha }}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned Rust toolchain
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal --component rustfmt --component clippy --target "$RELEASE_TARGET"
+          rustup default 1.95.0
+      - name: Install native musl compiler
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes musl-tools tmux
+          python - <<'PY'
+          import os
+          key = "CARGO_TARGET_" + os.environ["RELEASE_TARGET"].replace("-", "_").upper() + "_LINKER"
+          with open(os.environ["GITHUB_ENV"], "a") as output:
+              output.write(f"CC=musl-gcc\n{key}=musl-gcc\n")
+          PY
+      - name: Set the macOS deployment floor
+        if: runner.os == 'macOS'
+        run: printf 'MACOSX_DEPLOYMENT_TARGET=15.0\n' >> "$GITHUB_ENV"
+      - name: Install native terminal-test dependency
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: brew list tmux >/dev/null 2>&1 || brew install tmux
+      - name: Link the Windows C runtime statically
+        if: runner.os == 'Windows'
+        run: printf 'RUSTFLAGS=-C target-feature=+crt-static\n' >> "$GITHUB_ENV"
+      - name: Format, lint, and native tests
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --locked --all-targets --target "$RELEASE_TARGET" -- -D warnings
+          cargo test --locked --all-targets --target "$RELEASE_TARGET"
+          python -m unittest discover -s tests -p test_package_release.py
+      - name: Build and package exact binary
+        run: |
+          cargo build --locked --release --target "$RELEASE_TARGET" --bin rulescan
+          binary="target/$RELEASE_TARGET/release/rulescan"
+          if [ "$RUNNER_OS" = "Windows" ]; then binary="$binary.exe"; fi
+          "$binary" --version
+          python scripts/package-release.py --target "$RELEASE_TARGET" --version "$PACKAGE_VERSION" --commit "$SOURCE_SHA" --binary "$binary" --output-dir dist
+      - name: Verify terminal disconnect and external cancellation
+        if: runner.os != 'Windows'
+        run: |
+          command -v tmux
+          python tests/test_terminal_disconnect.py --binary "target/$RELEASE_TARGET/release/rulescan"
+      - name: Execute the packaged binary on its native OS
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, subprocess, tarfile, tempfile, zipfile
+          assets = list(pathlib.Path("dist").iterdir())
+          if len(assets) != 1:
+              raise SystemExit("Expected one packaged target asset")
+          with tempfile.TemporaryDirectory() as directory:
+              destination = pathlib.Path(directory)
+              asset = assets[0]
+              if asset.suffix == ".zip":
+                  with zipfile.ZipFile(asset) as archive:
+                      archive.extractall(destination)
+              else:
+                  with tarfile.open(asset) as archive:
+                      archive.extractall(destination, filter="data")
+              manifest = json.loads((destination / "manifest.json").read_text())
+              if manifest["commit"] != os.environ["SOURCE_SHA"] or manifest["target"] != os.environ["RELEASE_TARGET"]:
+                  raise SystemExit("Packaged manifest does not match this native build")
+              binary = destination / manifest["binary"]
+              result = subprocess.check_output([str(binary), "--version"], text=True).strip()
+              if result != "rulescan " + os.environ["PACKAGE_VERSION"]:
+                  raise SystemExit("Packaged executable has an unexpected version")
+              schema = json.loads(subprocess.check_output([str(binary), "schema", "--kind", "output"]))
+              if "$schema" not in schema:
+                  raise SystemExit("Packaged executable did not return its JSON schema")
+              print(result, "native packaged execution passed")
+          PY
+      - name: Verify the Unix installer against the native archive
+        if: runner.os != 'Windows'
+        run: |
+          archives=(dist/rulescan-*)
+          python tests/test_installers.py --archive "${archives[0]}" --version "$PACKAGE_VERSION"
+      - name: Verify the Windows installer with Windows PowerShell
+        if: runner.os == 'Windows'
+        run: |
+          archives=(dist/rulescan-*)
+          powershell -NoProfile -File tests/test_install.ps1 -Archive "${archives[0]}" -Version "$PACKAGE_VERSION"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: dist/rulescan-*
+          if-no-files-found: error
+          retention-days: 7
+
+  draft:
+    name: Assemble verified draft release
+    needs: [prepare, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      PACKAGE_VERSION: ${{ needs.prepare.outputs.version }}
+      SOURCE_SHA: ${{ needs.prepare.outputs.source_sha }}
+      RELEASE_EVENT: ${{ github.event_name }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.prepare.outputs.source_sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: binary-*
+          merge-multiple: true
+          path: dist
+      - name: Verify complete asset set and write checksums
+        run: |
+          python3 - <<'PY'
+          import hashlib, importlib.util, os, pathlib, shutil
+          spec = importlib.util.spec_from_file_location("packaging", "scripts/package-release.py")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          version = os.environ["PACKAGE_VERSION"]
+          expected = {f"rulescan-v{version}-{target}." + ("zip" if target.endswith("-windows-msvc") else "tar.gz") for target in module.TARGETS}
+          directory = pathlib.Path("dist")
+          if {p.name for p in directory.iterdir()} != expected:
+              raise SystemExit("Release is missing a target or contains unexpected assets")
+          for name in ["install.sh", "install.ps1"]:
+              shutil.copyfile(pathlib.Path("scripts") / name, directory / name)
+          with (directory / "SHA256SUMS").open("w") as output:
+              for path in sorted(directory.iterdir()):
+                  if path.name != "SHA256SUMS":
+                      output.write(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n")
+          PY
+      - name: Refuse existing releases or moved tags
+        run: |
+          python3 - <<'PY'
+          import os, re, subprocess
+          tag = os.environ["RELEASE_TAG"]
+          source = os.environ["SOURCE_SHA"]
+          refs = subprocess.check_output(["git", "ls-remote", "--tags", "origin", "refs/tags/" + tag, "refs/tags/" + tag + "^{}"], text=True).splitlines()
+          resolved = {line.split()[1]: line.split()[0] for line in refs}
+          existing = resolved.get("refs/tags/" + tag + "^{}", resolved.get("refs/tags/" + tag))
+          if existing and existing != source:
+              raise SystemExit("Existing tag moved away from the tested source; refusing release")
+          result = subprocess.run(["gh", "api", "--include", f"repos/{os.environ['GH_REPO']}/releases/tags/{tag}"], text=True, capture_output=True)
+          status = re.search(r"HTTP/\S+\s+(\d+)", result.stdout)
+          if result.returncode == 0:
+              raise SystemExit("This tag already has a release; refusing to overwrite any assets")
+          if status is None or status[1] != "404":
+              raise SystemExit("Could not establish that the release is absent: " + result.stderr)
+          PY
+      - name: Create draft with immutable source metadata
+        run: |
+          arguments=(--draft --latest=false --target "$SOURCE_SHA" --title "RuleScan $RELEASE_TAG" --notes-file docs/release-notes.md)
+          if [ "$RELEASE_EVENT" = "push" ]; then arguments+=(--verify-tag); fi
+          gh release create "$RELEASE_TAG" dist/* "${arguments[@]}"
+          printf 'Draft release prepared. Verify assets and publish explicitly; no release was made public.\n' >> "$GITHUB_STEP_SUMMARY"

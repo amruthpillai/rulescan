@@ -7,14 +7,98 @@ RuleScan is a local Rust CLI with a keyboard dashboard. Discovery, hashing, revi
 and monitoring work offline. No account, model, API key, or telemetry is required.
 **A matching filename is a candidate, not a verdict that its contents are safe.**
 
+## Install
+
+No Rust toolchain is needed for the prebuilt binaries.
+
+**macOS and Linux**
+
+```sh
+curl -fsSL https://github.com/amruthpillai/rulescan/releases/latest/download/install.sh | sh
+```
+
+**Windows — PowerShell**
+
+```powershell
+irm https://github.com/amruthpillai/rulescan/releases/latest/download/install.ps1 | iex
+```
+
+The installers select your platform, verify the archive against the release's
+SHA-256 checksums, and install for the current user without administrator access.
+They do not register a background service or change agent settings. Unix installs
+into `~/.local/bin`; Windows installs into `%LOCALAPPDATA%\Programs\RuleScan` and
+adds that directory to your user PATH. If `~/.local/bin` is not already on your
+PATH, add that directory to your shell PATH. Then run `rulescan`.
+
+To pin a release or choose a different directory, download and inspect the installer
+before running it. Unix accepts `RULESCAN_VERSION=v0.1.0` and
+`RULESCAN_INSTALL_DIR`; PowerShell accepts `-Version v0.1.0` and `-InstallDir`.
+For an upgrade with a background monitor running, stop it with `rulescan service
+stop`, rerun the installer, then start it with `rulescan service start`. The
+installer preserves configuration, approvals and quarantine.
+
+### Download a binary directly
+
+[All release assets and SHA256SUMS](https://github.com/amruthpillai/rulescan/releases/latest).
+The initial release provides these archives:
+
+| Platform | CPU | Download |
+| --- | --- | --- |
+| macOS 15+ | Apple Silicon | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-aarch64-apple-darwin.tar.gz) |
+| macOS 15+ | Intel x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-apple-darwin.tar.gz) |
+| Linux | x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-unknown-linux-musl.tar.gz) |
+| Linux | ARM64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-aarch64-unknown-linux-musl.tar.gz) |
+| Windows | x64 | [zip](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-pc-windows-msvc.zip) |
+
+Download the matching archive and `SHA256SUMS` from the same release. Verify its
+hash with `shasum -a 256` (macOS), `sha256sum` (Linux), or `Get-FileHash -Algorithm
+SHA256` (PowerShell). Extract it with `tar -xzf ARCHIVE.tar.gz` or Windows' **Extract
+All**, then put `rulescan` / `rulescan.exe` in a directory on your PATH. Keep the
+included `THIRD_PARTY_NOTICES.txt` with the installed binary.
+
+For example, after extracting the macOS or Linux archive:
+
+```sh
+mkdir -p "$HOME/.local/bin"
+install -m 755 rulescan "$HOME/.local/bin/rulescan"
+install -m 644 THIRD_PARTY_NOTICES.txt "$HOME/.local/bin/rulescan-notices.txt"
+"$HOME/.local/bin/rulescan" --version
+```
+
+Linux archives use musl and do not require a particular glibc version. Binaries are
+unsigned; macOS notarization and Windows code signing are not provided. **Windows
+currently supports inventory and inspection only; approval, quarantine and restore
+remain disabled pending native identity/ACL qualification.** Full limitations and
+validation evidence are in [the release checklist](docs/release.md).
+
+### Build from source
+
+Requires Rust 1.89 or newer; binary installation above does not.
+
 ```sh
 cargo build --locked --release
 ./target/release/rulescan
 ```
 
-Requires Rust 1.89 or newer. The package is unpublished; project licensing and
-release signing remain decisions for the maintainer. Native release qualification
-is tracked separately from compilation in [the release checklist](docs/release.md).
+## Screenshots
+
+Captured from the real macOS terminal UI using a harmless demo workspace.
+
+**Review findings alongside an approved-baseline diff.**
+
+![RuleScan dashboard showing changed instructions and their approved-baseline diff](docs/screenshots/dashboard.png)
+
+**Stage decisions, then review exact targets and content hashes before applying.**
+
+![RuleScan action review with approvals and a recoverable skill-bundle quarantine](docs/screenshots/review.png)
+
+**Inspect retained quarantine records and preview a restore.**
+
+![RuleScan quarantine view showing a retained skill and restore guidance](docs/screenshots/quarantine.png)
+
+[Capture method and reproduction instructions](docs/screenshots/README.md).
+
+## Review instructions
 
 The dashboard starts with the current workspace and existing user agent folders
 when no roots are configured. It discloses those roots, scans without changing

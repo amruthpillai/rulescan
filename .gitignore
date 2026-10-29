@@ -1,4 +1,6 @@
 /target/
+/dist/
+__pycache__/
 /fuzz/target/
 /fuzz/corpus/
 /fuzz/artifacts/

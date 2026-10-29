@@ -1,8 +1,8 @@
 # Development validation — 29 October 2026
 
-Host: Apple M1 Max (MacBookPro18,4), ARM64, macOS 27.0.1, APFS. These observations
-apply to this local checkout. No commit, hosted CI, public release or installed
-startup integration is implied.
+Original local development snapshot: Apple M1 Max (MacBookPro18,4), ARM64, macOS
+27.0.1, APFS. The checks below describe that snapshot. Current native binary and
+installer release evidence is recorded separately in [release validation](release-validation.md).
 
 | Proof | Result |
 | --- | --- |
@@ -57,5 +57,7 @@ install/login/reboot/upgrade/uninstall and macOS background privacy permissions,
 Windows identity/ACL/ADS/sharing cases, full-disk/fsync/process-kill fault injection
 at every stage, cross-volume removal, extended fuzz campaigns, large-tree/event
 storm/idle CPU measurements, user usability sessions, vulnerability advisories,
-release licensing, signed/notarized installers and public distribution remain
-release gates in `release.md`. `cargo-audit` is not installed in this environment.
+release licensing and signed/notarized installers remain qualifications in
+`release.md`. The subsequent [advisory audit](security-audit.md) and
+[release validation](release-validation.md) supersede the original pending
+advisory/public-distribution checks.

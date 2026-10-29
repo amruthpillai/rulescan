@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.89"
 description = "Review and monitor local AI agent instructions with exact-content approvals and recoverable quarantine"
+repository = "https://github.com/amruthpillai/rulescan"
 publish = false
 
 [dependencies]
@@ -26,6 +27,10 @@ sha2 = "0.10"
 similar = "2.7"
 uuid = { version = "1.18", features = ["v4", "serde"] }
 walkdir = "2.5"
+
+[target.'cfg(unix)'.dependencies]
+# The Unix poll backend handles terminal EOF instead of spinning inside Mio's reader.
+crossterm = { version = "0.29", default-features = false, features = ["use-dev-tty"] }
 
 [target.'cfg(unix)'.dev-dependencies]
 xattr = "1.6"

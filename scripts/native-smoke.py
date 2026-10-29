@@ -110,6 +110,21 @@ with tempfile.TemporaryDirectory(prefix="rulescan-smoke-") as temporary:
         os.write(master, b"q")
         pump(0.3)
         process.wait(timeout=10)
+        assert process.returncode == 0, "TUI did not exit normally"
+        # macOS sets transient PENDIN status when restoring cooked input. Exercise
+        # real canonical buffering, which settles that status, before comparing
+        # every saved terminal setting without masking any configuration bits.
+        cooked = selectors.DefaultSelector()
+        try:
+            cooked.register(slave, selectors.EVENT_READ)
+            probe = b"rulescan-terminal-restoration"
+            os.write(master, probe)
+            assert not cooked.select(timeout=0.05), "terminal input is not canonical"
+            os.write(master, b"\n")
+            assert cooked.select(timeout=1), "cooked terminal input did not arrive"
+            assert os.read(slave, len(probe) + 2) == probe + b"\n", "cooked input changed"
+        finally:
+            cooked.close()
         after = termios.tcgetattr(slave)
         assert before == after, "terminal settings were not restored"
         checked = subprocess.run([str(binary), "--state-dir", str(tui_state), "check", "--workspace", str(root), "--format", "json"],

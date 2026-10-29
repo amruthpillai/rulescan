@@ -1,6 +1,6 @@
 {
   "source": "Cargo.lock and cargo metadata --locked; includes dev and target-specific dependencies",
-  "advisory_audit": "Not run; cargo-audit is not installed. Required before release.",
+  "advisory_audit": "See docs/security-audit.json and docs/security-audit.md; rerun after every lockfile update.",
   "packages": [
     {
       "name": "aho-corasick",

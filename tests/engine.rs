@@ -303,6 +303,18 @@ fn skill_entrypoint_and_resources_can_be_reviewed_as_untrusted_text() {
         .engine
         .inspect_entry(&a.artifact_id, Path::new("scripts/action.txt"))
         .unwrap();
+    let equivalent = f
+        .engine
+        .inspect_entry(&a.artifact_id, Path::new("scripts//action.txt"))
+        .unwrap();
+    assert_eq!(equivalent["content"], resource["content"]);
+    #[cfg(windows)]
+    assert_eq!(
+        f.engine
+            .inspect_entry(&a.artifact_id, Path::new(r"scripts\action.txt"))
+            .unwrap()["content"],
+        resource["content"]
+    );
     assert_eq!(resource["content_is_untrusted"], true);
     assert!(!resource["content"].as_str().unwrap().contains('\x1b'));
     assert!(

@@ -41,7 +41,8 @@ retest filesystem and service semantics when related dependencies change. Profil
 behavior changes require an explicit revision bump and reapproval. Workflow
 actions are pinned to inspected remote commit IDs, rather than mutable tags.
 
-Security advisory audit is **not verified**: cargo-audit is not installed in the
-development environment. Run an up-to-date RustSec audit before public packaging.
-The inventory is a license/dependency record, not a legal compatibility opinion.
-Project license selection and binary redistribution review remain maintainer gates.
+The [release advisory audit](security-audit.md) found no known vulnerabilities
+and one informational unmaintained-parser warning; the raw RustSec report and
+lockfile hash are retained. Rerun it after dependency updates. The inventory is
+a license/dependency record, not a legal compatibility opinion. Project-level
+open-source licensing and platform code signing remain maintainer decisions.

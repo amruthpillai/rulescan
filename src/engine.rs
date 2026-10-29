@@ -224,10 +224,9 @@ impl Engine {
             Some(hash) == a.observed_sha256,
             "conflict: bundle changed since scan"
         );
-        let native = NativePath::new(relative);
         let entry = manifest
             .iter()
-            .find(|e| e.path.value == native.value && e.entry_type == "file")
+            .find(|e| e.entry_type == "file" && e.path.to_path().is_ok_and(|path| path == relative))
             .context("unknown regular bundle entry")?;
         let (bytes, _) = discovery::read_snapshot(&a.path.to_path()?.join(relative))?;
         ensure!(

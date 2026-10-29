@@ -1532,11 +1532,13 @@ pub fn run(
     app.start_scan();
     let result = (|| -> Result<i32> {
         loop {
-            app.pump();
-            terminal.draw(|frame| app.draw(frame))?;
-            if cancel.swap(false, Ordering::Relaxed) && app.request_quit() {
+            // Raw Ctrl-C is handled as a key below. OS termination cannot wait for
+            // a confirmation in a terminal that may already have disconnected.
+            if cancel.load(Ordering::Relaxed) {
                 return Ok(130);
             }
+            app.pump();
+            terminal.draw(|frame| app.draw(frame))?;
             if event::poll(Duration::from_millis(50))? {
                 match event::read()? {
                     Event::Key(key) if app.key(key) => return Ok(app.exit_code),

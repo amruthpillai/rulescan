@@ -7,7 +7,7 @@ import tomllib
 
 root = Path(__file__).resolve().parents[1]
 metadata = json.loads(subprocess.check_output(
-    ["rtk", "proxy", "cargo", "metadata", "--format-version", "1", "--locked"], cwd=root
+    ["cargo", "metadata", "--format-version", "1", "--locked"], cwd=root
 ))
 locked = tomllib.loads((root / "Cargo.lock").read_text())
 checksums = {(p["name"], p["version"]): p.get("checksum") for p in locked["package"]}
@@ -39,7 +39,7 @@ for package in sorted(metadata["packages"], key=lambda p: (p["name"], p["version
                        f"{'=' * 72}\n{path.read_text(errors='replace')}\n")
 (root / "docs/dependency-inventory.json").write_text(json.dumps({
     "source": "Cargo.lock and cargo metadata --locked; includes dev and target-specific dependencies",
-    "advisory_audit": "Not run; cargo-audit is not installed. Required before release.",
+    "advisory_audit": "See docs/security-audit.json and docs/security-audit.md; rerun after every lockfile update.",
     "packages": packages,
 }, indent=2) + "\n")
 (root / "docs/third-party-notices.txt").write_text("\n".join(notices))
