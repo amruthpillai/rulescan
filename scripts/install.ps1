@@ -34,8 +34,17 @@ try {
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 $repository = 'https://github.com/amruthpillai/rulescan'
 if ($Version -eq 'latest') {
-    $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/amruthpillai/rulescan/releases/latest' -Headers @{ 'User-Agent' = 'RuleScan-installer' }
-    $Version = [string] $release.tag_name
+    # The public redirect avoids GitHub's shared anonymous REST API quota.
+    $response = Invoke-WebRequest -UseBasicParsing -Uri "$repository/releases/latest"
+    $baseResponse = $response.BaseResponse
+    $resolved = if ($baseResponse.PSObject.Properties['ResponseUri']) {
+        $baseResponse.ResponseUri.AbsoluteUri # Windows PowerShell 5.1
+    } else {
+        $baseResponse.RequestMessage.RequestUri.AbsoluteUri # PowerShell 7
+    }
+    $prefix = "$repository/releases/tag/"
+    if (-not $resolved.StartsWith($prefix, [StringComparison]::Ordinal)) { throw 'Cannot resolve the latest release.' }
+    $Version = $resolved.Substring($prefix.Length)
 }
 if ($Version -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+(?:[-.][0-9A-Za-z.-]+)?$') { throw 'Version must be a release tag such as v0.1.0.' }
 $asset = "rulescan-$Version-x86_64-pc-windows-msvc.zip"

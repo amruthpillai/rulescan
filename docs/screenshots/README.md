@@ -1,8 +1,8 @@
 # Screenshots
 
-These are window captures of the real `rulescan` 0.1.0 release binary running its
-keyboard dashboard in Ghostty on macOS. Nothing was drawn, mocked or edited after
-capture.
+These are window captures of a locally built `rulescan` 0.1.0 binary
+(`cargo build --release`) running its keyboard dashboard in Ghostty on macOS.
+Nothing was drawn, mocked or edited after capture.
 
 | File | Shows |
 | --- | --- |

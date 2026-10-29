@@ -31,8 +31,8 @@ adds that directory to your user PATH. If `~/.local/bin` is not already on your
 PATH, add that directory to your shell PATH. Then run `rulescan`.
 
 To pin a release or choose a different directory, download and inspect the installer
-before running it. Unix accepts `RULESCAN_VERSION=v0.1.0` and
-`RULESCAN_INSTALL_DIR`; PowerShell accepts `-Version v0.1.0` and `-InstallDir`.
+before running it. Unix accepts `RULESCAN_VERSION=v0.1.1` and
+`RULESCAN_INSTALL_DIR`; PowerShell accepts `-Version v0.1.1` and `-InstallDir`.
 For an upgrade with a background monitor running, stop it with `rulescan service
 stop`, rerun the installer, then start it with `rulescan service start`. The
 installer preserves configuration, approvals and quarantine.
@@ -44,11 +44,11 @@ The initial release provides these archives:
 
 | Platform | CPU | Download |
 | --- | --- | --- |
-| macOS 15+ | Apple Silicon | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-aarch64-apple-darwin.tar.gz) |
-| macOS 15+ | Intel x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-apple-darwin.tar.gz) |
-| Linux | x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-unknown-linux-musl.tar.gz) |
-| Linux | ARM64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-aarch64-unknown-linux-musl.tar.gz) |
-| Windows | x64 | [zip](https://github.com/amruthpillai/rulescan/releases/download/v0.1.0/rulescan-v0.1.0-x86_64-pc-windows-msvc.zip) |
+| macOS 15+ | Apple Silicon | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.1/rulescan-v0.1.1-aarch64-apple-darwin.tar.gz) |
+| macOS 15+ | Intel x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.1/rulescan-v0.1.1-x86_64-apple-darwin.tar.gz) |
+| Linux | x64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.1/rulescan-v0.1.1-x86_64-unknown-linux-musl.tar.gz) |
+| Linux | ARM64 | [tar.gz](https://github.com/amruthpillai/rulescan/releases/download/v0.1.1/rulescan-v0.1.1-aarch64-unknown-linux-musl.tar.gz) |
+| Windows | x64 | [zip](https://github.com/amruthpillai/rulescan/releases/download/v0.1.1/rulescan-v0.1.1-x86_64-pc-windows-msvc.zip) |
 
 Download the matching archive and `SHA256SUMS` from the same release. Verify its
 hash with `shasum -a 256` (macOS), `sha256sum` (Linux), or `Get-FileHash -Algorithm

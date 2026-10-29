@@ -6,7 +6,7 @@ on:
       tag:
         description: Version tag matching Cargo.toml (a new tag is created only for the completed draft)
         required: true
-        default: v0.1.0
+        default: v0.1.1
         type: string
   push:
     tags: ["v*"]

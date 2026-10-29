@@ -3,7 +3,7 @@
 Audited `Cargo.lock` with cargo-audit 0.22.2 and a freshly fetched RustSec database.
 The [raw report](security-audit.json) is retained alongside the exact lockfile.
 
-- Lockfile SHA-256: `fd8e2a1f4d0d8f4b8f0b6d61161583734b7e4d80cc5e309729f446d53c930315`.
+- Lockfile SHA-256: `4a5451edf77ff7d4a7077ecdbe6d5e25ed537e69f5a671dd3d60e9efa9dbaff5`.
 - RustSec database commit: `40f5be6fb12ed93fc591bf4ab23b7d793b3f2239`.
 - Known vulnerabilities: **0**.
 - Informational warnings: **1**, `RUSTSEC-2024-0449`: `unsafe-libyaml` 0.2.11 is unmaintained.

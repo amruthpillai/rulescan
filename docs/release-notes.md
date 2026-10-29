@@ -1,4 +1,6 @@
-RuleScan 0.1.0 introduces direct binary installation for macOS, Linux and Windows.
+RuleScan 0.1.1 keeps Windows installation independent of GitHub's anonymous REST API quota by resolving the latest release through its public redirect.
+
+This patch rebuilds all five native binary targets from the same source. RuleScan's binary distribution, introduced in 0.1.0, includes:
 
 - Keyboard dashboard and JSON CLI for discovering and reviewing local agent instructions.
 - Exact-content approvals, bundle manifests, local import tracking, and recoverable same-volume quarantine/restore on macOS/Linux.

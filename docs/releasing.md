@@ -41,7 +41,7 @@ run local checks and push the intended source. The tag must equal `v` plus the
 package version. Use the workflow UI or GitHub CLI to request a draft:
 
 ```sh
-gh workflow run release.yml --ref main -f tag=v0.1.0
+gh workflow run release.yml --ref main -f tag=v0.1.1
 ```
 
 The workflow binds all builds and manifests to its exact checked-out commit. An
@@ -66,7 +66,7 @@ into a temporary user-owned directory. Keep the notices with distributed binarie
 After reviewing the draft and its platform limitations, publish it explicitly:
 
 ```sh
-gh release edit v0.1.0 --draft=false --latest
+gh release edit v0.1.1 --draft=false --latest
 ```
 
 Verify unauthenticated release/download URLs and run the documented installation
@@ -79,7 +79,7 @@ The packaging helper is also usable locally after a release build:
 
 ```sh
 python3 scripts/package-release.py --target aarch64-apple-darwin \
-  --version 0.1.0 --commit FULL_COMMIT_SHA \
+  --version 0.1.1 --commit FULL_COMMIT_SHA \
   --binary target/release/rulescan --output-dir dist
 python3 -m unittest discover -s tests -p test_package_release.py
 ```

@@ -14,6 +14,7 @@ $fixture = [PSCustomObject]@{
     Hash = $null
     Checksum = $null
     RequestedUrls = [Collections.Generic.List[string]]::new()
+    ModernResponse = $false
 }
 if ([IO.Path]::GetFileName($Archive) -cne $fixture.Asset) { throw 'Pass the native Windows x64 archive.' }
 $temporary = Join-Path ([IO.Path]::GetTempPath()) ('rulescan-installer-test-' + [Guid]::NewGuid().ToString('N'))
@@ -26,15 +27,20 @@ $installer = Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts\install.ps1'
 $initialPath = $env:Path
 
 # Capture one mutable fixture object rather than resolving script: in the installer's scope.
-Set-Item Function:Invoke-RestMethod -Value ({
-    param([string] $Uri, [hashtable] $Headers)
-    if ($Uri -cne 'https://api.github.com/repos/amruthpillai/rulescan/releases/latest') { throw "Unexpected metadata URL: $Uri" }
-    $fixture.RequestedUrls.Add($Uri)
-    return @{ tag_name = $fixture.Tag }
-}.GetNewClosure())
 Set-Item Function:Invoke-WebRequest -Value ({
     param([string] $Uri, [string] $OutFile, [switch] $UseBasicParsing)
     $fixture.RequestedUrls.Add($Uri)
+    if ($Uri -ceq 'https://github.com/amruthpillai/rulescan/releases/latest') {
+        $resolved = [Uri] ("https://github.com/amruthpillai/rulescan/releases/tag/" + $fixture.Tag)
+        if ($fixture.ModernResponse) {
+            return [PSCustomObject]@{ BaseResponse = [PSCustomObject]@{
+                RequestMessage = [PSCustomObject]@{ RequestUri = $resolved }
+            } }
+        }
+        return [PSCustomObject]@{ BaseResponse = [PSCustomObject]@{
+            ResponseUri = $resolved
+        } }
+    }
     $prefix = "https://github.com/amruthpillai/rulescan/releases/download/$($fixture.Tag)/"
     if ($Uri -ceq ($prefix + 'SHA256SUMS')) {
         [IO.File]::WriteAllText($OutFile, $fixture.Checksum, [Text.UTF8Encoding]::new($false))
@@ -58,8 +64,12 @@ try {
     if ((& $installed --version | Out-String).Trim() -cne ('rulescan ' + $fixture.Tag.Substring(1))) { throw 'Installed version mismatch.' }
     if (-not [IO.File]::Exists((Join-Path $destination 'rulescan-notices.txt'))) { throw 'Third-party notices were not installed.' }
     if ($fixture.RequestedUrls.Count -ne 3) { throw 'Latest metadata must be fetched once, then tag-specific assets.' }
+    if ($fixture.RequestedUrls[0] -cne 'https://github.com/amruthpillai/rulescan/releases/latest') { throw 'Latest resolution must use the public redirect, not the REST API.' }
     if ($env:Path -cne $initialPath) { throw 'NoModifyPath changed the process PATH.' }
     $originalHash = (Get-FileHash -LiteralPath $installed -Algorithm SHA256).Hash
+    $fixture.ModernResponse = $true
+    & $installer -InstallDir $destination -NoModifyPath
+    if ((Get-FileHash -LiteralPath $installed -Algorithm SHA256).Hash -cne $originalHash) { throw 'Modern response resolution changed the executable.' }
 
     $fixture.Checksum = ('0' * 64) + "  $($fixture.Asset)`n"
     Expect-Failure { & $installer -Version $fixture.Tag -InstallDir $destination -NoModifyPath } 'SHA-256 mismatch'
