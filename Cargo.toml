@@ -1,0 +1,42 @@
+[package]
+name = "rulescan"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+description = "Review and monitor local AI agent instructions with exact-content approvals and recoverable quarantine"
+publish = false
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+clap_complete = "4.5"
+ctrlc = { version = "3.4", features = ["termination"] }
+directories = "6.0"
+globset = "0.4"
+hex = "0.4"
+libc = "0.2"
+notify = "8.2"
+ratatui = "0.30.2"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+schemars = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml_ng = "0.10"
+sha2 = "0.10"
+similar = "2.7"
+uuid = { version = "1.18", features = ["v4", "serde"] }
+walkdir = "2.5"
+
+[target.'cfg(unix)'.dev-dependencies]
+xattr = "1.6"
+
+[dev-dependencies]
+proptest = "1.7"
+tempfile = "3.23"
+
+[profile.release]
+lto = "thin"
+strip = true
+
+[workspace]
+members = ["."]

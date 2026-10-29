@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "version": "builtin-1",
+  "loading_semantics": "Candidate conventions only; installed agent/client versions are not verified",
+  "rules": [
+    {"profile":"shared_instructions","id":"shared.agents","match":{"basename":"AGENTS.md","case":"insensitive"},"category":"instructions","source":"https://developers.openai.com/codex/guides/agents-md"},
+    {"profile":"shared_instructions","id":"shared.override","match":{"basename":"AGENTS.override.md","case":"insensitive"},"category":"instructions","source":"https://developers.openai.com/codex/guides/agents-md"},
+    {"profile":"codex","id":"codex.agents","match":{"basename":"AGENTS.md","case":"insensitive"},"category":"instructions","source":"https://developers.openai.com/codex/guides/agents-md"},
+    {"profile":"codex","id":"codex.override","match":{"basename":"AGENTS.override.md","case":"insensitive"},"category":"instructions","source":"https://developers.openai.com/codex/guides/agents-md"},
+    {"profile":"claude","id":"claude.memory","match":{"basename":"CLAUDE.md","case":"insensitive"},"category":"instructions","source":"https://code.claude.com/docs/en/memory"},
+    {"profile":"claude","id":"claude.local-memory","match":{"basename":"CLAUDE.local.md","case":"insensitive"},"category":"instructions","source":"https://code.claude.com/docs/en/memory"},
+    {"profile":"claude","id":"claude.rules","match":{"glob":"**/.claude/rules/**/*.md","case":"insensitive"},"category":"rules","source":"https://code.claude.com/docs/en/memory"},
+    {"profile":"gemini","id":"gemini.context","match":{"basename":"GEMINI.md","case":"insensitive"},"category":"instructions","source":"https://geminicli.com/docs/cli/gemini-md/"},
+    {"profile":"skills","id":"skills.bundle","match":{"bundle_marker":"SKILL.md","case":"insensitive"},"category":"skill","source":"https://agentskills.io/specification"},
+    {"profile":"copilot","id":"copilot.instructions","match":{"glob":"**/.github/copilot-instructions.md","case":"insensitive"},"category":"instructions","source":"https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions"},
+    {"profile":"copilot","id":"copilot.path-instructions","match":{"glob":"**/.github/instructions/**/*.instructions.md","case":"insensitive"},"category":"instructions","source":"https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions"},
+    {"profile":"copilot","id":"copilot.prompts","match":{"glob":"**/.github/prompts/**/*.prompt.md","case":"insensitive"},"category":"prompt","source":"https://docs.github.com/en/copilot"},
+    {"profile":"copilot","id":"copilot.agents","match":{"glob":"**/.github/agents/**/*.agent.md","case":"insensitive"},"category":"prompt","source":"https://docs.github.com/en/copilot"},
+    {"profile":"cursor","id":"cursor.legacy-rules","match":{"basename":".cursorrules","case":"insensitive"},"category":"rules","source":"https://cursor.com/docs/context/rules"},
+    {"profile":"cursor","id":"cursor.rules","match":{"glob":"**/.cursor/rules/**/*.mdc","case":"insensitive"},"category":"rules","source":"https://cursor.com/docs/context/rules"},
+    {"profile":"hooks","id":"hooks.dot-mcp","match":{"basename":".mcp.json","case":"insensitive"},"category":"agent_configuration","source":"https://code.claude.com/docs/en/mcp"},
+    {"profile":"hooks","id":"hooks.mcp","match":{"basename":"mcp.json","case":"insensitive"},"category":"agent_configuration","source":"https://cursor.com/docs/context/mcp"},
+    {"profile":"hooks","id":"hooks.claude-settings","match":{"glob":"**/.claude/**/settings.json","case":"insensitive"},"category":"agent_configuration","source":"https://code.claude.com/docs/en/settings"},
+    {"profile":"hooks","id":"hooks.claude-local-settings","match":{"glob":"**/.claude/**/settings.local.json","case":"insensitive"},"category":"agent_configuration","source":"https://code.claude.com/docs/en/settings"},
+    {"profile":"hooks","id":"hooks.gemini-settings","match":{"glob":"**/.gemini/**/settings.json","case":"insensitive"},"category":"agent_configuration","source":"https://geminicli.com/docs/get-started/configuration/"},
+    {"profile":"hooks","id":"hooks.gemini-local-settings","match":{"glob":"**/.gemini/**/settings.local.json","case":"insensitive"},"category":"agent_configuration","source":"https://geminicli.com/docs/get-started/configuration/"},
+    {"profile":"hooks","id":"hooks.codex-settings","match":{"glob":"**/.codex/**/config.toml","case":"insensitive"},"category":"agent_configuration","source":"https://developers.openai.com/codex/config-reference"}
+  ]
+}

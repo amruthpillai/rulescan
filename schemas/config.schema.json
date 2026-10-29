@@ -1,0 +1,255 @@
+{
+  "$defs": {
+    "AnalysisConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "Case": {
+      "enum": [
+        "sensitive",
+        "insensitive"
+      ],
+      "type": "string"
+    },
+    "Exclusion": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "MatchSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "basename": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bundle_marker": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "case": {
+          "$ref": "#/$defs/Case",
+          "default": "sensitive"
+        },
+        "glob": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Rule": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "match": {
+          "$ref": "#/$defs/MatchSpec"
+        },
+        "on_change": {
+          "default": "review",
+          "type": "string"
+        },
+        "on_new": {
+          "default": "review",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "match",
+        "category"
+      ],
+      "type": "object"
+    },
+    "ScanConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "follow_directory_links": {
+          "default": false,
+          "type": "boolean"
+        },
+        "include_hidden": {
+          "default": true,
+          "type": "boolean"
+        },
+        "respect_repository_ignores": {
+          "default": false,
+          "type": "boolean"
+        },
+        "roots": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UiConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "default": "auto",
+          "type": "string"
+        },
+        "keymap": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "WatchConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "debounce": {
+          "default": "500ms",
+          "type": "string"
+        },
+        "default_action": {
+          "default": "notify",
+          "type": "string"
+        },
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        },
+        "poll_every": {
+          "default": "30s",
+          "type": "string"
+        },
+        "reconcile_every": {
+          "default": "6h",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Workspace": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "policy": {
+          "$ref": "#/$defs/WorkspacePolicy"
+        }
+      },
+      "required": [
+        "path",
+        "policy"
+      ],
+      "type": "object"
+    },
+    "WorkspacePolicy": {
+      "enum": [
+        "approved_content"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "analysis": {
+      "$ref": "#/$defs/AnalysisConfig",
+      "default": {
+        "enabled": false
+      }
+    },
+    "exclusions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Exclusion"
+      },
+      "type": "array"
+    },
+    "profiles": {
+      "additionalProperties": {
+        "type": "boolean"
+      },
+      "default": {},
+      "type": "object"
+    },
+    "rules": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Rule"
+      },
+      "type": "array"
+    },
+    "scan": {
+      "$ref": "#/$defs/ScanConfig",
+      "default": {
+        "follow_directory_links": false,
+        "include_hidden": true,
+        "respect_repository_ignores": false,
+        "roots": []
+      }
+    },
+    "ui": {
+      "$ref": "#/$defs/UiConfig",
+      "default": {
+        "color": "auto",
+        "keymap": {}
+      }
+    },
+    "version": {
+      "default": 1,
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "watch": {
+      "$ref": "#/$defs/WatchConfig",
+      "default": {
+        "debounce": "500ms",
+        "default_action": "notify",
+        "enabled": false,
+        "poll_every": "30s",
+        "reconcile_every": "6h"
+      }
+    },
+    "workspaces": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Workspace"
+      },
+      "type": "array"
+    }
+  },
+  "title": "Config",
+  "type": "object"
+}

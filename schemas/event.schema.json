@@ -1,0 +1,411 @@
+{
+  "$defs": {
+    "ApprovalState": {
+      "enum": [
+        "new",
+        "approved",
+        "changed",
+        "missing",
+        "quarantined",
+        "unreadable",
+        "excluded"
+      ],
+      "type": "string"
+    },
+    "ArtifactChange": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "type": "string"
+        },
+        "observed_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sequence": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ApprovalState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sequence",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "Coverage": {
+      "properties": {
+        "cancelled": {
+          "type": "boolean"
+        },
+        "entries_visited": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "exclusions": {
+          "items": {
+            "$ref": "#/$defs/CoverageGap"
+          },
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "$ref": "#/$defs/CoverageGap"
+          },
+          "type": "array"
+        },
+        "roots": {
+          "items": {
+            "$ref": "#/$defs/NativePath"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "roots",
+        "entries_visited",
+        "gaps",
+        "exclusions",
+        "cancelled"
+      ],
+      "type": "object"
+    },
+    "CoverageGap": {
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "ItemOutcome": {
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "quarantine_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "status",
+        "detail"
+      ],
+      "type": "object"
+    },
+    "MonitorHealth": {
+      "additionalProperties": false,
+      "description": "Persisted in the `monitor_health` setting and refreshed on every heartbeat.",
+      "properties": {
+        "event_overflows": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "executable": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "heartbeat_at": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "heartbeat_interval_secs": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "last_complete_reconcile": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "last_error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_reconcile": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "pending_findings": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pid": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "polling_fallbacks": {
+          "items": {
+            "$ref": "#/$defs/RootFallback"
+          },
+          "type": "array"
+        },
+        "queue": {
+          "description": "Roots waiting for a debounced rescan (all roots after an overflow).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "started_at": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "status": {
+          "description": "starting, reconciling, watching, degraded, stopped",
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "watched_roots": {
+          "items": {
+            "$ref": "#/$defs/NativePath"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pid",
+        "version",
+        "status",
+        "started_at",
+        "heartbeat_at",
+        "heartbeat_interval_secs",
+        "watched_roots",
+        "polling_fallbacks",
+        "queue",
+        "pending_findings",
+        "event_overflows"
+      ],
+      "type": "object"
+    },
+    "NativePath": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "encoding",
+        "value",
+        "display"
+      ],
+      "type": "object"
+    },
+    "RootFallback": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "root": {
+          "$ref": "#/$defs/NativePath"
+        }
+      },
+      "required": [
+        "root",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "WatchEventKind": {
+      "enum": [
+        "started",
+        "reconciled",
+        "degraded",
+        "stopped"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One JSONL record. Paths are escaped native paths; file contents are never included.",
+  "properties": {
+    "changes": {
+      "description": "Artifact observations recorded since the previous emitted cursor, deduplicated by artifact and digest.",
+      "items": {
+        "$ref": "#/$defs/ArtifactChange"
+      },
+      "type": "array"
+    },
+    "changes_truncated": {
+      "type": "boolean"
+    },
+    "completion": {
+      "description": "`completed` only when every reconciled root had complete coverage.",
+      "type": "string"
+    },
+    "coverage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Coverage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "format": "uint64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "exit_code": {
+      "format": "int32",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "health": {
+      "$ref": "#/$defs/MonitorHealth"
+    },
+    "kind": {
+      "$ref": "#/$defs/WatchEventKind"
+    },
+    "note": {
+      "type": "string"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "policy_version": {
+      "type": "string"
+    },
+    "profile_version": {
+      "type": "string"
+    },
+    "recovery": {
+      "items": {
+        "$ref": "#/$defs/ItemOutcome"
+      },
+      "type": "array"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "schema_version": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "sequence": {
+      "description": "Persistent, strictly increasing cursor (shared with the audit event log).",
+      "format": "uint64",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "trigger": {
+      "description": "What caused this record: startup, native_event, overflow, periodic, poll_fallback, root_replaced, cancel.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "sequence",
+    "created_at",
+    "kind",
+    "operation",
+    "completion",
+    "trigger",
+    "profile_version",
+    "policy_version",
+    "changes",
+    "changes_truncated",
+    "recovery",
+    "health",
+    "errors",
+    "note"
+  ],
+  "title": "WatchEvent",
+  "type": "object"
+}

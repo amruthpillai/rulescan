@@ -1,0 +1,31 @@
+{
+  "arch": "aarch64",
+  "cache_state": "OS caches not controlled; second pass is warm",
+  "expected_candidates": 1000,
+  "generated_files": 100000,
+  "os": "macos",
+  "results": [
+    {
+      "artifacts": 1000,
+      "coverage_complete": true,
+      "elapsed_ms": 1105,
+      "entries_visited": 101101,
+      "pass": 1
+    },
+    {
+      "artifacts": 1000,
+      "coverage_complete": true,
+      "elapsed_ms": 1096,
+      "entries_visited": 101101,
+      "pass": 2
+    }
+  ],
+  "version": "0.1.0",
+  "measured_on": "2026-10-29",
+  "hardware": "Apple M1 Max / MacBookPro18,4",
+  "os_version": "macOS 27.0.1",
+  "filesystem": "APFS",
+  "build": "release, locked dependencies",
+  "permissions": "ordinary current-user temporary workspace; no permission denials",
+  "cpu_and_peak_memory": "Not measured"
+}

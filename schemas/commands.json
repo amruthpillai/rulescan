@@ -1,0 +1,395 @@
+{
+  "about": "Review and monitor local AI agent instructions",
+  "arguments": [
+    {
+      "id": "state_dir",
+      "long": "state-dir",
+      "required": false
+    },
+    {
+      "id": "config",
+      "long": "config",
+      "required": false
+    },
+    {
+      "id": "format",
+      "long": "format",
+      "required": false
+    },
+    {
+      "id": "no_input",
+      "long": "no-input",
+      "required": false
+    },
+    {
+      "id": "plain",
+      "long": "plain",
+      "required": false
+    },
+    {
+      "id": "no_color",
+      "long": "no-color",
+      "required": false
+    }
+  ],
+  "name": "rulescan",
+  "subcommands": [
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "root",
+          "long": "root",
+          "required": false
+        }
+      ],
+      "name": "scan",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "findings",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "status",
+              "long": "status",
+              "required": false
+            }
+          ],
+          "name": "list",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "artifact_id",
+          "long": null,
+          "required": true
+        },
+        {
+          "id": "content",
+          "long": "content",
+          "required": false
+        },
+        {
+          "id": "diff",
+          "long": "diff",
+          "required": false
+        },
+        {
+          "id": "entry",
+          "long": "entry",
+          "required": false
+        }
+      ],
+      "name": "inspect",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "artifact_id",
+          "long": null,
+          "required": true
+        }
+      ],
+      "name": "explain",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "workspace",
+          "long": "workspace",
+          "required": true
+        }
+      ],
+      "name": "verify",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "workspace",
+          "long": "workspace",
+          "required": true
+        }
+      ],
+      "name": "check",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "plan",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "id",
+              "long": "id",
+              "required": true
+            },
+            {
+              "id": "expected_sha256",
+              "long": "expected-sha256",
+              "required": true
+            }
+          ],
+          "name": "approve",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "id",
+              "long": "id",
+              "required": true
+            },
+            {
+              "id": "expected_sha256",
+              "long": "expected-sha256",
+              "required": true
+            }
+          ],
+          "name": "quarantine",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "plan_id",
+              "long": null,
+              "required": true
+            }
+          ],
+          "name": "show",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "plan_id",
+          "long": null,
+          "required": true
+        }
+      ],
+      "name": "apply",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "quarantine",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [],
+          "name": "list",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "quarantine_id",
+          "long": null,
+          "required": true
+        },
+        {
+          "id": "to",
+          "long": "to",
+          "required": false
+        }
+      ],
+      "name": "restore",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "recover",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "config",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [],
+          "name": "validate",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "show",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "init",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "patterns",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "path",
+              "long": "path",
+              "required": true
+            }
+          ],
+          "name": "test",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "kind",
+          "long": "kind",
+          "required": false
+        }
+      ],
+      "name": "schema",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "shell",
+          "long": null,
+          "required": true
+        }
+      ],
+      "name": "completions",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "foreground",
+          "long": "foreground",
+          "required": true
+        },
+        {
+          "id": "root",
+          "long": "root",
+          "required": false
+        },
+        {
+          "id": "once",
+          "long": "once",
+          "required": false
+        }
+      ],
+      "name": "watch",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "service",
+      "subcommands": [
+        {
+          "about": null,
+          "arguments": [
+            {
+              "id": "apply",
+              "long": "apply",
+              "required": false
+            }
+          ],
+          "name": "install",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "start",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "stop",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "status",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "logs",
+          "subcommands": []
+        },
+        {
+          "about": null,
+          "arguments": [],
+          "name": "uninstall",
+          "subcommands": []
+        }
+      ]
+    },
+    {
+      "about": null,
+      "arguments": [],
+      "name": "doctor",
+      "subcommands": []
+    },
+    {
+      "about": null,
+      "arguments": [
+        {
+          "id": "workspace",
+          "long": "workspace",
+          "required": true
+        },
+        {
+          "id": "executable",
+          "long": null,
+          "required": true
+        }
+      ],
+      "name": "run",
+      "subcommands": []
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+[package]
+name = "rulescan-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+rulescan = { path = ".." }
+serde_yaml_ng = "0.10"
+
+[[bin]]
+name = "config_and_preview"
+path = "fuzz_targets/config_and_preview.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+members = ["."]

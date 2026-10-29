@@ -1,0 +1,372 @@
+{
+  "$defs": {
+    "ApprovalState": {
+      "enum": [
+        "new",
+        "approved",
+        "changed",
+        "missing",
+        "quarantined",
+        "unreadable",
+        "excluded"
+      ],
+      "type": "string"
+    },
+    "Artifact": {
+      "properties": {
+        "allowed_next_actions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "approval_digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "artifact_id": {
+          "type": "string"
+        },
+        "bundle_manifest": {
+          "items": {
+            "$ref": "#/$defs/ManifestEntry"
+          },
+          "type": "array"
+        },
+        "category": {
+          "type": "string"
+        },
+        "identity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FileIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "matching_rule_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "observed_at": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observed_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "policy_version": {
+          "type": "string"
+        },
+        "profile_version": {
+          "type": "string"
+        },
+        "profiles": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "references": {
+          "items": {
+            "$ref": "#/$defs/Reference"
+          },
+          "type": "array"
+        },
+        "relative_path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "root": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "root_id": {
+          "type": "string"
+        },
+        "root_identity": {
+          "$ref": "#/$defs/FileIdentity"
+        },
+        "state": {
+          "$ref": "#/$defs/ApprovalState"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "root_id",
+        "root",
+        "root_identity",
+        "path",
+        "relative_path",
+        "category",
+        "profiles",
+        "matching_rule_ids",
+        "reasons",
+        "bundle_manifest",
+        "references",
+        "state",
+        "profile_version",
+        "policy_version",
+        "allowed_next_actions",
+        "observed_at"
+      ],
+      "type": "object"
+    },
+    "Coverage": {
+      "properties": {
+        "cancelled": {
+          "type": "boolean"
+        },
+        "entries_visited": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "exclusions": {
+          "items": {
+            "$ref": "#/$defs/CoverageGap"
+          },
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "$ref": "#/$defs/CoverageGap"
+          },
+          "type": "array"
+        },
+        "roots": {
+          "items": {
+            "$ref": "#/$defs/NativePath"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "roots",
+        "entries_visited",
+        "gaps",
+        "exclusions",
+        "cancelled"
+      ],
+      "type": "object"
+    },
+    "CoverageGap": {
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "FileIdentity": {
+      "properties": {
+        "file": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "links": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mode": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "modified_ns": {
+          "format": "uint128",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "size": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "volume": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "volume",
+        "file",
+        "links",
+        "mode",
+        "size",
+        "modified_ns"
+      ],
+      "type": "object"
+    },
+    "ManifestEntry": {
+      "properties": {
+        "entry_type": {
+          "type": "string"
+        },
+        "executable_mode": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "link_target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mode": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "entry_type",
+        "executable_mode",
+        "mode"
+      ],
+      "type": "object"
+    },
+    "NativePath": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "encoding",
+        "value",
+        "display"
+      ],
+      "type": "object"
+    },
+    "Reference": {
+      "properties": {
+        "artifact_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/NativePath"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "reason"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "completion": {
+      "type": "string"
+    },
+    "coverage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Coverage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "data": {
+      "items": {
+        "$ref": "#/$defs/Artifact"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "operation": {
+      "type": "string"
+    },
+    "policy_version": {
+      "type": "string"
+    },
+    "profile_version": {
+      "type": "string"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "schema_version": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "request_id",
+    "operation",
+    "completion",
+    "profile_version",
+    "policy_version",
+    "errors"
+  ],
+  "title": "Envelope",
+  "type": "object"
+}
