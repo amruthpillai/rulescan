@@ -490,7 +490,9 @@ pub fn rename_exclusive(
     };
     #[cfg(target_os = "linux")]
     let result = unsafe {
-        libc::renameat2(
+        // musl has no renameat2 C wrapper; retain the kernel's atomic no-replace operation.
+        libc::syscall(
+            libc::SYS_renameat2,
             src.as_raw_fd(),
             name.as_ptr(),
             dst.as_raw_fd(),
